@@ -100,6 +100,7 @@ void setup() {
   bs.updateExtraConfigItem(updateExtraConfigItem);
   bs.updateExtraHtmlTemplateItems(updateExtraHtmlTemplateItems);
 
+  // if setup fails, we fail
   if (!bs.setup()) return;
 
   // // initialize our extended config struct if values are not set
@@ -167,31 +168,34 @@ void loop() {
 
   static unsigned long lastUpdate = bs.resetReason == RESET_REASON_DEEP_SLEEP_AWAKE ? ULONG_MAX : 0;
 
-  if ((lastUpdate == ULONG_MAX || millis() > lastUpdate + sht_config.publish_interval) && sht30.get() == 0) {
-    _temperature = sht30.fTemp + SENSOR_TEMPERATURE_VARIANCE;
-    _humidity = int(sht30.humidity);
+  if (lastUpdate == ULONG_MAX || millis() > lastUpdate + sht_config.publish_interval) {
+    if (sht30.get() == 0) {
+      _temperature = sht30.fTemp + SENSOR_TEMPERATURE_VARIANCE;
+      _humidity = int(sht30.humidity);
 
-    if (isSampleValid(_temperature) && isSampleValid(_humidity)) {
-      LOG_PRINTF("Temperature: %.1fºF / Humidity: %d%%\n", _temperature, _humidity);
-      LOG_FLUSH();
+      if (isSampleValid(_temperature) && isSampleValid(_humidity)) {
+        LOG_PRINTF("Temperature: %.1fºF / Humidity: %d%%\n", _temperature, _humidity);
+        LOG_FLUSH();
 
-      update_lcd(_temperature, _humidity);
+        update_lcd(_temperature, _humidity);
 
-      tempSensor->setValue(_temperature);
-      humidSensor->setValue(_humidity);
+        tempSensor->setValue(_temperature);
+        humidSensor->setValue(_humidity);
 
-      if (bs.wifimode == WIFI_STA) 
-        ipAddressSensor->setValue(WiFi.localIP().toString().c_str());
-      
-      if (bs.resetReason != RESET_REASON_DEEP_SLEEP_AWAKE) bs.updateHtmlTemplate("/index.template.html", false);      
-
-      lastUpdate = millis();
-
-      mqtt.loop();
-      delay(500);
+        if (bs.wifimode == WIFI_STA) 
+          ipAddressSensor->setValue(WiFi.localIP().toString().c_str());
+        
+        if (bs.resetReason != RESET_REASON_DEEP_SLEEP_AWAKE) bs.updateHtmlTemplate("/index.template.html", false);      
+      } else {
+        LOG_PRINTLN("temperature and humidity sample rejected!");
+      }
     } else {
-      LOG_PRINTLN("temperature and humidity sample rejected!");
+      LOG_PRINTLN("SHT30 results invalid!");
     }
+    lastUpdate = millis();
+
+    mqtt.loop();
+    delay(500);
 
     bs.requestDeepSleep(sht_config.publish_interval * 1000);
   }
