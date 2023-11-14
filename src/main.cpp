@@ -86,7 +86,7 @@ void updateExtraHtmlTemplateItems(String *html) {
 }
 
 void setup() {
-  #ifdef BS_USE_TELNETSPY
+    #ifdef BS_USE_TELNETSPY
     bs.setExtraRemoteCommands(setExtraRemoteCommands);
   #endif
 
@@ -167,6 +167,11 @@ void loop() {
   }
 
   static unsigned long lastUpdate = bs.resetReason == RESET_REASON_DEEP_SLEEP_AWAKE ? ULONG_MAX : 0;
+
+  // we've wrapped
+  if (lastUpdate != ULONG_MAX && lastUpdate > millis()) {
+    lastUpdate = millis();
+  }
 
   if (lastUpdate == ULONG_MAX || millis() > lastUpdate + sht_config.publish_interval) {
     if (sht30.get() == 0) {
