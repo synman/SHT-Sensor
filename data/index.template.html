@@ -60,17 +60,29 @@
             <th colspan="2"><img valign="middle" src="{chipset_icon}">&nbsp;{project_name}</th>
         </tr>
         <tr>
-            <td>Temperature</td>
+            <td>SHT30 Temperature</td>
             <td>
-                <span class="sensor">{temperature}&deg; F</span>
+                <span class="sensor">{sht30_temperature}&deg; F</span>
             </td>
         </tr>
         <tr>
-            <td>Humidity</td>
+            <td>SHT30 Humidity</td>
             <td>
-                <span class="sensor">{humidity}%</span>
+                <span class="sensor">{sht30_humidity}%</span>
             </td>
         </tr>
+        <!-- <tr>
+            <td>HP303B Temperature</td>
+            <td>
+                <span class="sensor">{hp303b_temperature}&deg; F</span>
+            </td>
+        </tr>
+        <tr>
+            <td>HP303B Pressure</td>
+            <td>
+                <span class="sensor">{hp303b_pressure} inHg</span>
+            </td>
+        </tr> -->
         <tr>
             <td colspan=2>{ip_address} - {timestamp}</td>
         </tr>

@@ -11,11 +11,13 @@ as published by Sam Hocevar. See the COPYING file for more details.
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <WEMOS_SHT3X.h>
 #include <ArduinoHA.h>
+#include <WEMOS_SHT3X.h>
+#include <LOLIN_HP303B.h>
 
 Adafruit_SSD1306 display(0);
 SHT3X sht30(0x45);
+// LOLIN_HP303B HP303BSensor;
 
 #ifdef BS_USE_TELNETSPY
     TelnetSpy SerialAndTelnet;
@@ -32,8 +34,11 @@ SHT3X sht30(0x45);
 #define DEFAULT_PUBLISH_INTERVAL       60000
 #define MIN_PUBLISH_INTERVAL           1000
 
-#define TEMPERATURE                    "temperature"
-#define HUMIDITY                       "humidity"
+#define SHT30_TEMPERATURE              "sht30_temperature"
+#define SHT30_HUMIDITY                 "sht30_humidity"
+
+#define HP303B_TEMPERATURE              "hp303b_temperature"
+#define HP303B_PRESSURE                 "hp303b_pressure"
 
 #define MQTT_SERVER_LEN                16
 #define MQTT_USER_LEN                  16
@@ -54,8 +59,13 @@ typedef struct sht_config_type : config_type {
 
 SHT_CONFIG_TYPE sht_config;
 
-float           _temperature = 0.0;
-tiny_int        _humidity = 0;
+float           hp303b_temperature = 0.0;
+float           hp303b_pressure = 0.0;
+
+float           sht30_temperature = 0.0;
+tiny_int        sht30_humidity = 0;
+
+const float HPA_TO_INHG                  = 0.02952998057228486;
 
 HADevice device;
 WiFiClient wifiClient;
@@ -64,16 +74,20 @@ HAMqtt mqtt(wifiClient, device, 10);
 byte deviceId[40];
 char deviceName[40];
 
-char tempSensorName[80];
-char humidSensorName[80];
+char sht30_tempSensorName[80];
+char sht30_humidSensorName[80];
+char hp303b_tempSensorName[80];
+char hp303b_pressSensorName[80];
+char voltageSensorName[80];
 char ipAddressSensorName[80];
 
-HASensorNumber* tempSensor;
-HASensorNumber* humidSensor;
+HASensorNumber* sht30_tempSensor;
+HASensorNumber* sht30_humidSensor;
+HASensorNumber* hp303b_tempSensor;
+HASensorNumber* hp303b_pressSensor;
+HASensorNumber* voltageSensor;
 HASensor* ipAddressSensor;
 
 const bool isSampleValid(const float value);
 const String escParam(const char *param_name);
 void update_lcd(const tiny_int temp, const tiny_int humidity);
-
-
