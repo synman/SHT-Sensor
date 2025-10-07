@@ -136,7 +136,7 @@ void setup() {
 
   // configure sensors
   strcpy(sht30_tempSensorName,   (uniqueId + "_sht30_temperature_sensor").c_str());
-  strcpy(sht30_humidSensorName,  (uniqueId + "_sht30_humdity_sensor").c_str());
+  strcpy(sht30_humidSensorName,  (uniqueId + "_sht30_humidity_sensor").c_str());
   // strcpy(hp303b_tempSensorName,  (uniqueId + "_hp303b_temperature_sensor").c_str());
   // strcpy(hp303b_pressSensorName, (uniqueId + "_hp303b_pressure_sensor").c_str());
   // strcpy(voltageSensorName,      (uniqueId + "_battery_voltage_sensor").c_str());
@@ -151,7 +151,7 @@ void setup() {
   
   sht30_tempSensor->setDeviceClass("temperature");
   sht30_tempSensor->setName("SHT30 Temperature");
-  sht30_tempSensor->setUnitOfMeasurement("F");
+  sht30_tempSensor->setUnitOfMeasurement("°F");
 
   sht30_humidSensor->setDeviceClass("humidity");
   sht30_humidSensor->setName("SHT30 Humidity");
